@@ -1,5 +1,6 @@
 package incubyte.Kata_Sweet_Shop_Management_System;
 
+import java.util.List;
 import java.util.Scanner;
 
 public class Main {
@@ -60,6 +61,18 @@ public class Main {
             }
         }
     }
+    private static int getValidatedInt(Scanner scanner, String prompt, SweetService service) {
+    int value;
+    while (true) {
+        value = getValidatedInt(scanner, prompt); 
+        if (prompt.equalsIgnoreCase("Enter ID: ") && service.idExists(value)) {
+            System.out.println("ID already exists. Please enter a different ID.");
+        } else {
+            return value;
+        }
+    }
+}
+
 
     private static double getValidatedDouble(Scanner scanner, String prompt) {
         double value;
@@ -82,6 +95,7 @@ public class Main {
             }
         }
     }
+    
 
     private static void showOperationsMenu(Scanner scanner, SweetService service) {
         while (true) {
@@ -99,7 +113,7 @@ public class Main {
 
             switch (choice) {
                 case "1":
-                    int id = getValidatedInt(scanner, "Enter ID: ");
+                    int id = getValidatedInt(scanner, "Enter ID: ", service);
                     System.out.print("Enter Name: ");
                     String name = scanner.nextLine();
                     System.out.print("Enter Category: ");
@@ -132,14 +146,17 @@ public class Main {
 
     private static void showSearchMenu(Scanner scanner, SweetService service) {
         while (true) {
-            System.out.println("\n╔══════════════════════════════════════╗");
-            System.out.println("║          SEARCH & SORT MENU          ║");
-            System.out.println("╠══════════════════════════════════════╣");
-            System.out.println("║ 1. Search by Name                    ║");
-            System.out.println("║ 2. Search by Category                ║");
-            System.out.println("║ 3. Search by Price Range             ║");
-            System.out.println("║ 4. Back to Main Menu                 ║");
-            System.out.println("╚══════════════════════════════════════╝");
+            System.out.println("\n╔════════════════════════════════════════════╗");
+            System.out.println("║          SEARCH & SORT MENU                ║");
+            System.out.println("╠════════════════════════════════════════════╣");
+            System.out.println("║ 1. Search by Name                          ║");
+            System.out.println("║ 2. Search by Category                      ║");
+            System.out.println("║ 3. Search by Price Range                   ║");
+            System.out.println("║ 4. Sort sweets by name                     ║");
+            System.out.println("║ 5. Sort sweets by price (Low to High)      ║");
+            System.out.println("║ 6. Sort sweets by price (High to Low)      ║");
+            System.out.println("║ 7. Back to Main Menu                       ║");
+            System.out.println("╚════════════════════════════════════════════╝");
             System.out.print("Select an option: ");
 
             String choice = scanner.nextLine();
@@ -153,13 +170,31 @@ public class Main {
                     System.out.print("Enter category to search: ");
                     service.searchByCategory(scanner.nextLine());
                     break;
+                    
                 case "3":
                     double min = getValidatedDouble(scanner, "Enter minimum price: ");
                     double max = getValidatedDouble(scanner, "Enter maximum price: ");
                     service.searchByPriceRange(min, max);
                     break;
+                
                 case "4":
+                    List<Sweet> sortedByName = service.sortSweetsByName();
+                    sortedByName.forEach(System.out::println);
+                    break;
+
+                case "5":
+                    List<Sweet> sortedByPriceAsc = service.sortSweetsByPriceAscending();
+                    sortedByPriceAsc.forEach(System.out::println);
+                    break;
+
+                case "6":
+                    List<Sweet> sortedByPriceDesc = service.sortSweetsByPriceDescending();
+                    sortedByPriceDesc.forEach(System.out::println);
+                    break;
+
+                case "7":
                     return;
+
                 default:
                     System.out.println("Invalid option.");
             }

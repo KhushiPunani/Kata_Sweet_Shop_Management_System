@@ -6,6 +6,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import java.io.File;
 import java.io.IOException;
 import java.util.*;
+import java.util.stream.Collectors;
 
 public class SweetService {
     private String FILE_PATH;
@@ -42,6 +43,12 @@ public class SweetService {
             System.out.println("Error saving sweets: " + e.getMessage());
         }
     }
+
+    
+   public boolean idExists(int id) {
+    return sweets.stream().anyMatch(s -> s.getId() == id);
+}
+
 
     public boolean isValidSweet(Sweet sweet) {
         return sweet != null &&
@@ -132,51 +139,67 @@ public class SweetService {
             System.out.println("No sweet found in that price range.");
     }
 
+    public List<Sweet> sortSweetsByName() {
+        return sweets.stream()
+                .sorted(Comparator.comparing(Sweet::getName))
+                .collect(Collectors.toList());
+    }
+
+    public List<Sweet> sortSweetsByPriceAscending() {
+        return sweets.stream()
+                .sorted(Comparator.comparingDouble(Sweet::getPrice))
+                .collect(Collectors.toList());
+    }
+
+    public List<Sweet> sortSweetsByPriceDescending() {
+        return sweets.stream()
+                .sorted(Comparator.comparingDouble(Sweet::getPrice).reversed())
+                .collect(Collectors.toList());
+    }
+
     public void purchaseSweet(int id, int qty) {
-    if (qty <= 0) {
-        System.out.println("Quantity must be greater than zero.");
-        return;
+        if (qty <= 0) {
+            System.out.println("Quantity must be greater than zero.");
+            return;
+        }
+
+        Optional<Sweet> optionalSweet = sweets.stream().filter(s -> s.getId() == id).findFirst();
+
+        if (optionalSweet.isEmpty()) {
+            System.out.println("Sweet with this ID does not exist.");
+            return;
+        }
+
+        Sweet sweet = optionalSweet.get();
+
+        if (sweet.getQuantity() < qty) {
+            System.out.println("Not enough stock to complete the purchase.");
+            return;
+        }
+
+        sweet.setQuantity(sweet.getQuantity() - qty);
+        saveData();
+        System.out.println("Purchase successful. Remaining stock: " + sweet.getQuantity());
     }
-
-    Optional<Sweet> optionalSweet = sweets.stream().filter(s -> s.getId() == id).findFirst();
-
-    if (optionalSweet.isEmpty()) {
-        System.out.println("Sweet with this ID does not exist.");
-        return;
-    }
-
-    Sweet sweet = optionalSweet.get();
-
-    if (sweet.getQuantity() < qty) {
-        System.out.println("Not enough stock to complete the purchase.");
-        return;
-    }
-
-    sweet.setQuantity(sweet.getQuantity() - qty);
-    saveData();
-    System.out.println("Purchase successful. Remaining stock: " + sweet.getQuantity());
-}
-
 
     public void restockSweet(int id, int qty) {
-    if (qty <= 0) {
-        System.out.println("Quantity must be greater than zero.");
-        return;
+        if (qty <= 0) {
+            System.out.println("Quantity must be greater than zero.");
+            return;
+        }
+
+        Optional<Sweet> optionalSweet = sweets.stream().filter(s -> s.getId() == id).findFirst();
+
+        if (optionalSweet.isEmpty()) {
+            System.out.println("Sweet with this ID does not exist.");
+            return;
+        }
+
+        Sweet sweet = optionalSweet.get();
+        sweet.setQuantity(sweet.getQuantity() + qty);
+        saveData();
+        System.out.println("Sweet restocked. New quantity: " + sweet.getQuantity());
     }
-
-    Optional<Sweet> optionalSweet = sweets.stream().filter(s -> s.getId() == id).findFirst();
-
-    if (optionalSweet.isEmpty()) {
-        System.out.println("Sweet with this ID does not exist.");
-        return;
-    }
-
-    Sweet sweet = optionalSweet.get();
-    sweet.setQuantity(sweet.getQuantity() + qty);
-    saveData();
-    System.out.println("Sweet restocked. New quantity: " + sweet.getQuantity());
-}
-
 
     public List<Sweet> getSweets() {
         return sweets;

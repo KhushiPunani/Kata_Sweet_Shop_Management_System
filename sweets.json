@@ -2,24 +2,36 @@
   "id" : 101,
   "name" : "Kaju Katli",
   "category" : "Kaju Barfi",
-  "price" : 1000.0,
+  "price" : 400.0,
   "quantity" : 10
 }, {
   "id" : 102,
   "name" : "Gulab Jamun",
-  "category" : "Indian Sweet",
-  "price" : 200.0,
-  "quantity" : 40
+  "category" : "Indian",
+  "price" : 100.0,
+  "quantity" : 50
 }, {
   "id" : 103,
   "name" : "Rasmalai",
   "category" : "Milk Based",
   "price" : 300.0,
-  "quantity" : 5
+  "quantity" : 40
 }, {
   "id" : 104,
   "name" : "Ladoo",
   "category" : "Indian",
+  "price" : 150.0,
+  "quantity" : 25
+}, {
+  "id" : 105,
+  "name" : "Basundi",
+  "category" : "Milk Based",
   "price" : 50.0,
-  "quantity" : 20
-}]
+  "quantity" : 1
+}, {
+  "id" : 106,
+  "name" : "Mysore pak",
+  "category" : "Indian",
+  "price" : 400.0,
+  "quantity" : 30
+} ]

@@ -9,6 +9,7 @@ import static org.junit.jupiter.api.Assertions.*;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.PrintStream;
+import java.util.List;
 
 public class SweetServiceTest {
 
@@ -90,7 +91,7 @@ public class SweetServiceTest {
 
     @AfterEach
     void tearDown() {
-        System.setOut(originalOut); // restore System.out
+        System.setOut(originalOut); // restoree System.out
         outContent.reset();
     }
 
@@ -139,11 +140,53 @@ public class SweetServiceTest {
         assertEquals("No sweet found in that price range.", output);
     }
 
+    @Test
+    public void testSortSweetsByName() {
+        
+        service.getSweets().clear(); // Clear preloaded sweets
+
+        Sweet sweet1 = new Sweet(1, "Kaju Katli", "Nut-Based", 50, 10);
+        Sweet sweet2 = new Sweet(2, "Barfi", "Milk-Based", 40, 5);
+        service.addSweet(sweet1);
+        service.addSweet(sweet2);
+
+        List<Sweet> sorted = service.sortSweetsByName();
+        assertEquals("Barfi", sorted.get(0).getName());
+        assertEquals("Kaju Katli", sorted.get(1).getName());
+    }
+
+    @Test
+    public void testSortSweetsByPriceAscending() {
+        Sweet sweet1 = new Sweet(1, "Gulab Jamun", "Milk-Based", 20, 30);
+        Sweet sweet2 = new Sweet(2, "Rasgulla", "Milk-Based", 10, 15);
+        service.addSweet(sweet1);
+        service.addSweet(sweet2);
+
+        List<Sweet> sorted = service.sortSweetsByPriceAscending();
+        assertEquals(10.0, sorted.get(0).getPrice(), 0.001);
+        assertEquals(20.0, sorted.get(1).getPrice(), 0.001);
+    }
+
+    @Test
+    public void testSortByPriceDescending() {
+
+        service.getSweets().clear(); // Clear preloaded
+
+        Sweet sweet1 = new Sweet(1, "Gulab Jamun", "Milk-Based", 10, 30);
+        Sweet sweet2 = new Sweet(2, "Rasgulla", "Milk-Based", 20, 15);
+        service.addSweet(sweet1);
+        service.addSweet(sweet2);
+
+        List<Sweet> sorted = service.sortSweetsByPriceDescending();
+        assertEquals(20.0, sorted.get(0).getPrice(), 0.001);
+        assertEquals(10.0, sorted.get(1).getPrice(), 0.001);
+    }
+
     // -------------------------------------------------- INVENTORY MANAGEMENT
 
     @Test
     public void testPurchaseSweet_quantityExceedsStock() {
-        service.purchaseSweet(302, 20); // Jalebi has 15
+        service.purchaseSweet(302, 20); 
         String output = outContent.toString().trim();
         assertEquals("Not enough stock to complete the purchase.", output);
     }
