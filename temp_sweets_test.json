@@ -1,0 +1,25 @@
+[ {
+  "id" : 301,
+  "name" : "Barfi",
+  "category" : "Milk",
+  "price" : 120.0,
+  "quantity" : 10
+}, {
+  "id" : 302,
+  "name" : "Jalebi",
+  "category" : "Desi",
+  "price" : 90.0,
+  "quantity" : 15
+}, {
+  "id" : 303,
+  "name" : "Rasgulla",
+  "category" : "Milk",
+  "price" : 100.0,
+  "quantity" : 20
+}, {
+  "id" : 304,
+  "name" : "Ladoo",
+  "category" : "Festival",
+  "price" : 80.0,
+  "quantity" : 12
+} ]

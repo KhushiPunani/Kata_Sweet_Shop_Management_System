@@ -8,11 +8,18 @@ import java.io.IOException;
 import java.util.*;
 
 public class SweetService {
-    private final String FILE_PATH = "sweets.json";
+    private String FILE_PATH;
     private List<Sweet> sweets = new ArrayList<>();
     private final ObjectMapper mapper = new ObjectMapper();
 
     public SweetService() {
+        this.FILE_PATH = "sweets.json";
+        loadData();
+    }
+
+    // ✅ This constructor is only for testing
+    public SweetService(String filePath) {
+        this.FILE_PATH = filePath;
         loadData();
     }
 
@@ -20,7 +27,8 @@ public class SweetService {
         try {
             File file = new File(FILE_PATH);
             if (file.exists()) {
-                this.sweets = mapper.readValue(file, new TypeReference<List<Sweet>>() {});
+                this.sweets = mapper.readValue(file, new TypeReference<List<Sweet>>() {
+                });
             }
         } catch (IOException e) {
             System.out.println("Error loading sweets: " + e.getMessage());
@@ -35,7 +43,30 @@ public class SweetService {
         }
     }
 
+    public boolean isValidSweet(Sweet sweet) {
+        return sweet != null &&
+                sweet.getId() > 0 &&
+                sweet.getName() != null &&
+                !sweet.getName().trim().isEmpty() &&
+                sweet.getCategory() != null &&
+                !sweet.getCategory().trim().isEmpty() &&
+                sweet.getPrice() > 0 &&
+                sweet.getQuantity() >= 0; // Allow zero quantity for out-of-stock
+    }
+
     public void addSweet(Sweet sweet) {
+        if (!isValidSweet(sweet)) {
+            throw new IllegalArgumentException(
+                    "Invalid sweet data. Please ensure ID > 0, Name/Category are non-empty, and Price/Quantity > 0.");
+        }
+
+        // Check for duplicate ID
+        for (Sweet s : sweets) {
+            if (s.getId() == sweet.getId()) {
+                throw new IllegalArgumentException("Sweet with this ID already exists.");
+            }
+        }
+
         sweets.add(sweet);
         saveData();
     }
@@ -52,7 +83,7 @@ public class SweetService {
     }
 
     public void viewSweets() {
-        loadData(); 
+        loadData();
         if (sweets.isEmpty()) {
             System.out.println("No sweets available.");
             return;
@@ -71,7 +102,8 @@ public class SweetService {
                 found = true;
             }
         }
-        if (!found) System.out.println("No sweet found with that name.");
+        if (!found)
+            System.out.println("No sweet found with that name.");
     }
 
     public void searchByCategory(String category) {
@@ -83,7 +115,8 @@ public class SweetService {
                 found = true;
             }
         }
-        if (!found) System.out.println("No sweet found in that category.");
+        if (!found)
+            System.out.println("No sweet found in that category.");
     }
 
     public void searchByPriceRange(double min, double max) {
@@ -95,39 +128,55 @@ public class SweetService {
                 found = true;
             }
         }
-        if (!found) System.out.println("No sweet found in that price range.");
+        if (!found)
+            System.out.println("No sweet found in that price range.");
     }
 
-    public void purchaseSweet(int id, int quantity) {
-        loadData();
-        for (Sweet s : sweets) {
-            if (s.getId() == id) {
-                if (s.getQuantity() >= quantity) {
-                    s.setQuantity(s.getQuantity() - quantity);
-                    saveData();
-                    System.out.println("Purchase successful. Remaining stock: " + s.getQuantity());
-                    return;
-                } else {
-                    System.out.println("Error: Not enough stock.");
-                    return;
-                }
-            }
-        }
-        System.out.println("Sweet not found.");
+    public void purchaseSweet(int id, int qty) {
+    if (qty <= 0) {
+        System.out.println("Quantity must be greater than zero.");
+        return;
     }
 
-    public void restockSweet(int id, int quantity) {
-        loadData();
-        for (Sweet s : sweets) {
-            if (s.getId() == id) {
-                s.setQuantity(s.getQuantity() + quantity);
-                saveData();
-                System.out.println("Sweet restocked. New quantity: " + s.getQuantity());
-                return;
-            }
-        }
-        System.out.println("Sweet not found.");
+    Optional<Sweet> optionalSweet = sweets.stream().filter(s -> s.getId() == id).findFirst();
+
+    if (optionalSweet.isEmpty()) {
+        System.out.println("Sweet with this ID does not exist.");
+        return;
     }
+
+    Sweet sweet = optionalSweet.get();
+
+    if (sweet.getQuantity() < qty) {
+        System.out.println("Not enough stock to complete the purchase.");
+        return;
+    }
+
+    sweet.setQuantity(sweet.getQuantity() - qty);
+    saveData();
+    System.out.println("Purchase successful. Remaining stock: " + sweet.getQuantity());
+}
+
+
+    public void restockSweet(int id, int qty) {
+    if (qty <= 0) {
+        System.out.println("Quantity must be greater than zero.");
+        return;
+    }
+
+    Optional<Sweet> optionalSweet = sweets.stream().filter(s -> s.getId() == id).findFirst();
+
+    if (optionalSweet.isEmpty()) {
+        System.out.println("Sweet with this ID does not exist.");
+        return;
+    }
+
+    Sweet sweet = optionalSweet.get();
+    sweet.setQuantity(sweet.getQuantity() + qty);
+    saveData();
+    System.out.println("Sweet restocked. New quantity: " + sweet.getQuantity());
+}
+
 
     public List<Sweet> getSweets() {
         return sweets;

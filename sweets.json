@@ -22,10 +22,4 @@
   "category" : "Indian",
   "price" : 50.0,
   "quantity" : 20
-}, {
-  "id" : 101,
-  "name" : "Ladoo",
-  "category" : "Indian",
-  "price" : 25.0,
-  "quantity" : 10
-} ]
+}]
